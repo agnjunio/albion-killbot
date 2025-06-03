@@ -42,6 +42,16 @@ const albionApiClient = axios.create({
 
 // Setup timeouts for crawler axios client because sometimes server just hangs indefinetly
 albionApiClient.interceptors.request.use((config) => {
+  const clientHeaders = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+    Accept: "application/json",
+  };
+
+  config.headers = {
+    ...config.headers,
+    ...clientHeaders,
+  };
+
   if (config.server) {
     const server = ALBION_SERVERS.find((server) => server.id === config.server.id);
     if (server) config.baseURL = server.url;
