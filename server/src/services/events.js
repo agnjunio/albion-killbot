@@ -108,6 +108,16 @@ async function getEventVictimLootValue(event, { server }) {
   return albion.getLootValue(event, { server });
 }
 
+// Validate event to skip processing, return reason or null if valid
+function isInvalidEvent(event) {
+  // Ignore /die events
+  if (event.Killer.Id === event.Victim.Id) {
+    return "SUICIDE_EVENT";
+  }
+
+  return null;
+}
+
 module.exports = {
   fetchEvents,
   fetchEventsTo,
@@ -115,4 +125,5 @@ module.exports = {
   getEventVictimLootValue,
   publishEvent,
   subscribeEvents,
+  isInvalidEvent,
 };

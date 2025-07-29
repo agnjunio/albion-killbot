@@ -7,7 +7,7 @@ const { embedEvent, embedEventImage, embedEventInventoryImage } = require("../..
 const { transformGuild } = require("../../../helpers/discord");
 const { getServerById, transformEvent } = require("../../../helpers/albion");
 
-const { subscribeEvents, getEventVictimLootValue } = require("../../../services/events");
+const { subscribeEvents, getEventVictimLootValue, isInvalidEvent } = require("../../../services/events");
 const { generateEventImage, generateInventoryImage } = require("../../../services/images");
 const { getSettings } = require("../../../services/settings");
 const { getTrack } = require("../../../services/track");
@@ -114,11 +114,21 @@ async function subscribe(client) {
     const server = getServerById(event.server);
     if (!server) throw new Error(`Albion Server not found: ${event.server}`);
 
-    logger.debug(`[${server.name}] Processing event: ${event.EventId}`, {
-      server,
-      guilds: client.guilds.cache.size,
-      eventId: event.EventId,
-    });
+    const reason = isInvalidEvent(event);
+    if (reason) {
+      logger.debug(`[${server.name}] Skipping event ${event.EventId} because it is invalid. Reason: ${reason}`, {
+        server,
+        eventId: event.EventId,
+        reason,
+      });
+      return true;
+    } else {
+      logger.debug(`[${server.name}] Processing event: ${event.EventId}`, {
+        server,
+        guilds: client.guilds.cache.size,
+        eventId: event.EventId,
+      });
+    }
 
     try {
       for (const guild of client.guilds.cache.values()) {

@@ -27,11 +27,6 @@ function getTrackedEvent(event, track, limits) {
     return null;
   }
 
-  // Ignore Arena kills or Duel kills
-  if (event.TotalVictimKillFame <= 0) {
-    return null;
-  }
-
   const playerIds = players.filter((item) => item.server === event.server).map((item) => item.id);
   const guildIds = guilds.filter((item) => item.server === event.server).map((item) => item.id);
   const allianceIds = alliances.filter((item) => item.server === event.server).map((item) => item.id);
