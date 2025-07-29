@@ -183,8 +183,8 @@ async function search(query, { server = SERVER_DEFAULT }) {
   }
 }
 
-const useCurrentLootValue = async (server, itemList, qualities) => {
-  const itemPriceData = await albionDataApiClient.getCurrentPrices(itemList.join(), {
+const useCurrentLootValue = async (server, items, qualities) => {
+  const itemPriceData = await albionDataApiClient.getCurrentPrices(items.join(), {
     server,
     locations: ["Thetford", "Fort Sterling", "Martlock", "Bridgewatch", "Lymhurst"].join(),
     qualities,
@@ -217,8 +217,8 @@ const useCurrentLootValue = async (server, itemList, qualities) => {
   };
 };
 
-const useHistoryLootValue = async (server, itemList, qualities) => {
-  const history = await albionDataApiClient.getHistoryPrices(itemList, {
+const useHistoryLootValue = async (server, items, qualities) => {
+  const history = await albionDataApiClient.getHistoryPrices(items.join(), {
     server,
     locations: ["Thetford", "Fort Sterling", "Martlock", "Bridgewatch", "Lymhurst"].join(),
     qualities,
@@ -266,7 +266,7 @@ async function getLootValue(event, { server = SERVER_DEFAULT }) {
         const victimItems = getVictimItems(event);
         if (victimItems.equipment.length === 0 && victimItems.inventory.length === 0) return null;
 
-        const itemList = []
+        const items = []
           .concat(victimItems.equipment)
           .concat(victimItems.inventory)
           .map((item) => item.Type)
@@ -279,8 +279,8 @@ async function getLootValue(event, { server = SERVER_DEFAULT }) {
           .sort();
 
         const { itemPriceData, calculateLootValue } = config.get("features.events.useHistoryPrices")
-          ? await useHistoryLootValue(server, itemList.join(), qualities)
-          : await useCurrentLootValue(server, itemList.join(), qualities);
+          ? await useHistoryLootValue(server, items, qualities)
+          : await useCurrentLootValue(server, items, qualities);
 
         if (!itemPriceData || !calculateLootValue) return null;
         return {
