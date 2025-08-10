@@ -24,7 +24,7 @@ on:
         required: true
         type: boolean
   schedule:
-    - cron: '30 4 * * 0'
+    - cron: "30 4 * * 0"
 
 jobs:
   deploy-api:
@@ -42,10 +42,10 @@ jobs:
           script: |
             docker compose pull &&
             docker compose --ansi never up -d --force-recreate --remove-orphans api
-    
+
   deploy-crawler:
     name: Deploy crawler
-    if: ${{ inputs.crawler || 'false' }}
+    if: ${{ inputs.crawler || 'true' }}
     runs-on: ubuntu-latest
     environment: production
     steps:
@@ -70,14 +70,14 @@ jobs:
       matrix:
         shard: [0, 1, 2, 3]
         include:
-        - shard: 0
-          SSH_HOST: SSH_HOST_BOT_0
-        - shard: 1
-          SSH_HOST: SSH_HOST_BOT_1
-        - shard: 2
-          SSH_HOST: SSH_HOST_BOT_2
-        - shard: 3
-          SSH_HOST: SSH_HOST_BOT_3
+          - shard: 0
+            SSH_HOST: SSH_HOST_BOT_0
+          - shard: 1
+            SSH_HOST: SSH_HOST_BOT_1
+          - shard: 2
+            SSH_HOST: SSH_HOST_BOT_2
+          - shard: 3
+            SSH_HOST: SSH_HOST_BOT_3
     steps:
       - name: Deploy bot shard '#${{ matrix.shard }}'
         uses: appleboy/ssh-action@v1.0.3
@@ -88,4 +88,3 @@ jobs:
           script: |
             touch migration-state.json &&
             docker compose --ansi never up -d --pull always --force-recreate --remove-orphans bot
-
