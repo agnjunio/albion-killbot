@@ -97,11 +97,21 @@ async function updateSettingsCache(serverIds, { timeout, debug } = {}) {
   });
 }
 
+async function hasServerSettings(serverIds = []) {
+  const servers = await find(SETTINGS_COLLECTION, { server: { $in: serverIds } });
+  const hasServerSettings = {};
+  for (const serverId of serverIds) {
+    hasServerSettings[serverId] = servers.some((server) => server.server === serverId);
+  }
+  return hasServerSettings;
+}
+
 module.exports = {
   REPORT_MODES,
   deleteSettings,
   fetchAllSettings,
   getSettings,
   setSettings,
+  hasServerSettings,
   updateSettingsCache,
 };

@@ -23,13 +23,14 @@ async function getBotServers() {
 
 async function getServers(accessToken) {
   try {
-    const botServerIds = (await discord.getBotGuilds()).map((s) => s.id);
     const servers = await discord.getUserGuilds(accessToken);
+    const serverIds = servers.map((server) => server.id);
+    const hasServerSettings = await settingsService.hasServerSettings(serverIds);
 
     return servers
       .filter((server) => server.owner || server.admin)
       .map((server) => {
-        server.bot = botServerIds.indexOf(server.id) >= 0;
+        server.bot = hasServerSettings[server.id];
         return server;
       });
   } catch (error) {

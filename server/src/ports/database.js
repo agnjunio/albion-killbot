@@ -96,8 +96,14 @@ async function deleteOne(collectionName, filter) {
   return returnObjectId(result);
 }
 
+async function countDocuments(collectionName, filter) {
+  const collection = getCollection(collectionName);
+  return await collection.countDocuments(convertObjectId(filter));
+}
+
 module.exports = {
   cleanup,
+  countDocuments,
   deleteMany,
   deleteOne,
   dropColection,
