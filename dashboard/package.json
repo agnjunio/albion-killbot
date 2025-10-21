@@ -1,6 +1,6 @@
 {
   "name": "dashboard",
-  "version": "4.23.14",
+  "version": "4.23.15",
   "private": true,
   "scripts": {
     "start": "react-scripts start",
