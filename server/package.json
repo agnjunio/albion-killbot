@@ -32,7 +32,7 @@
     "cors": "^2.8.5",
     "cron": "^3.1.6",
     "datadog-winston": "^1.5.1",
-    "discord.js": "^14.10.2",
+    "discord.js": "^14.26.3",
     "dotenv": "^16.0.1",
     "express": "^4.21.2",
     "express-rate-limit": "^6.5.1",
