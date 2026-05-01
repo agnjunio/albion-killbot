@@ -20,6 +20,12 @@ const liveId = {
   europe: "live_ams",
 };
 
+const killboard1Region = {
+  americas: "us",
+  asia: "as",
+  europe: "eu",
+};
+
 const albion2dSudbdomain = (server) => (server !== "americas" ? `${server}.` : "");
 
 const REPORT_PROVIDERS = [
@@ -46,6 +52,11 @@ const REPORT_PROVIDERS = [
     id: "kill-board",
     name: "Kill-board",
     battles: ({ id }) => `https://kill-board.com/battles/${id}`,
+  },
+  {
+    id: "killboard-1",
+    name: "KillBoard#1",
+    events: ({ id, server }) => `https://killboard-1.com/${killboard1Region[server]}/event/${id}`,
   },
 ];
 
