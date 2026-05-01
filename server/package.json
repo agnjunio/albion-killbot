@@ -19,9 +19,6 @@
     "prettier": "prettier -c .",
     "prettier:fix": "prettier --write ."
   },
-  "engines": {
-    "node": "^18.x"
-  },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1041.0",
     "amqplib": "^0.9.1",
