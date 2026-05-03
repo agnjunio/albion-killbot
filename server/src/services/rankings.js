@@ -40,7 +40,7 @@ async function addRankingEvent(event) {
   }
 }
 
-async function getRanking(serverId, type = "daily", { limit = 5 } = {}) {
+async function getRanking(serverId, type = "daily", { limit = 10 } = {}) {
   const track = await getTrack(serverId);
   if (!track) return null;
   if (track.players.length === 0 && track.guilds.length === 0 && track.alliances.length === 0) return null;

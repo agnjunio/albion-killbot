@@ -5,7 +5,8 @@ const { digitsFormatter, humanFormatter, printSpace } = require("./utils");
 const { SERVER_LIST } = require("./albion");
 
 const BATTLE = 16752981;
-const RANKING_LINE_LENGTH = 23;
+const RANKING_LINE_LENGTH = 45;
+const RANKING_RANK_PREFIX_WIDTH = 4;
 
 const COLORS = {
   LIGHT_GREEN: 0x57ad65,
@@ -442,18 +443,33 @@ const embedTrackList = (track, limits, { locale }) => {
 const embedRanking = (rankings, { locale, test } = {}) => {
   const { t } = getLocale(locale);
 
+  const truncateRankingName = (name, maxLen) => {
+    const safe = name || "?";
+    if (maxLen <= 0) return "";
+    if (safe.length <= maxLen) return safe;
+    if (maxLen === 1) return safe.slice(0, 1);
+    return `${safe.slice(0, maxLen - 1)}…`;
+  };
+
+  const formatRankingRow = (rankIndex, player, scoreProperty) => {
+    const prefix = `${rankIndex}. `.padEnd(RANKING_RANK_PREFIX_WIDTH, " ");
+    const scoreStr = humanFormatter(player.totalScore[scoreProperty], 2);
+    const maxNameLen = Math.max(1, RANKING_LINE_LENGTH - prefix.length - scoreStr.length - 1);
+    const namePart = truncateRankingName(player.name, maxNameLen);
+    const gap = RANKING_LINE_LENGTH - prefix.length - namePart.length - scoreStr.length;
+    return `${prefix}${namePart}${printSpace(Math.max(gap, 1))}${scoreStr}`;
+  };
+
   const generateRankFieldValue = (ranking, scoreProperty) => {
     let value = "```c";
     if (ranking.length === 0) {
-      const nodata = t("RANKING.NO_DATA_SHORT");
+      let nodata = t("RANKING.NO_DATA_SHORT");
+      if (nodata.length > RANKING_LINE_LENGTH) nodata = truncateRankingName(nodata, RANKING_LINE_LENGTH);
       const count = RANKING_LINE_LENGTH - nodata.length;
-      value += `\n${nodata}${printSpace(count)}`;
+      value += `\n${nodata}${printSpace(Math.max(count, 0))}`;
     }
-    ranking.forEach((player) => {
-      const nameValue = player.name;
-      const numberValue = humanFormatter(player.totalScore[scoreProperty], 2);
-      const count = RANKING_LINE_LENGTH - numberValue.length - nameValue.length;
-      value += `\n${nameValue}${printSpace(count)}${numberValue}`;
+    ranking.forEach((player, i) => {
+      value += `\n${formatRankingRow(i + 1, player, scoreProperty)}`;
     });
     value += "```";
     return value;
@@ -494,19 +510,14 @@ const embedRanking = (rankings, { locale, test } = {}) => {
             inline: true,
           },
           {
-            name: "\u200B",
-            value: "\u200B",
-            inline: false,
-          },
-          {
             name: t("RANKING.KILL_FAME"),
             value: generateRankFieldValue(rankings.killFameRanking, "killFame"),
-            inline: true,
+            inline: false,
           },
           {
             name: t("RANKING.DEATH_FAME"),
             value: generateRankFieldValue(rankings.deathFameRanking, "deathFame"),
-            inline: true,
+            inline: false,
           },
         ],
         footer,
