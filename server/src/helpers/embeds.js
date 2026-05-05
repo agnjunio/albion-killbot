@@ -5,7 +5,7 @@ const { digitsFormatter, humanFormatter, printSpace } = require("./utils");
 const { SERVER_LIST } = require("./albion");
 
 const BATTLE = 16752981;
-const RANKING_LINE_LENGTH = 45;
+const RANKING_LINE_LENGTH = 40;
 const RANKING_RANK_PREFIX_WIDTH = 4;
 
 const COLORS = {
@@ -507,6 +507,11 @@ const embedRanking = (rankings, { locale, test } = {}) => {
           {
             name: t("RANKING.TOTAL_DEATH_FAME"),
             value: digitsFormatter(rankings.deathFameTotal),
+            inline: true,
+          },
+          {
+            name: "\u200B",
+            value: "\u200B",
             inline: true,
           },
           {
