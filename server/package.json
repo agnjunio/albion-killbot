@@ -22,7 +22,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1041.0",
     "amqplib": "^0.9.1",
-    "axios": "^1.15.2",
+    "axios": "^1.16.0",
     "canvas": "^2.11.2",
     "config": "^3.3.10",
     "connect-mongo": "^4.6.0",
@@ -31,7 +31,7 @@
     "datadog-winston": "^1.5.1",
     "discord.js": "^14.26.3",
     "dotenv": "^16.0.1",
-    "express": "^4.21.2",
+    "express": "^4.22.2",
     "express-rate-limit": "^6.5.1",
     "express-session": "^1.18.2",
     "fast-redact": "^3.1.2",
@@ -46,6 +46,10 @@
     "swagger-ui-express": "^4.4.0",
     "winston": "^3.8.1",
     "winston-loggly-bulk": "^3.3.1"
+  },
+  "overrides": {
+    "fast-xml-builder": "1.2.0",
+    "ws": "8.20.1"
   },
   "devDependencies": {
     "eslint": "^8.55.0",

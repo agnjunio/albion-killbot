@@ -33,10 +33,15 @@
     "react-cookienotice": "^6.0.2",
     "react-dom": "^18.1.0",
     "react-redux": "^8.0.2",
-    "react-router-dom": "^6.30.3",
+    "react-router-dom": "^6.30.4",
     "react-scripts": "^5.0.1",
     "styled-components": "^5.3.5",
     "web-vitals": "^2.1.4"
+  },
+  "overrides": {
+    "@babel/plugin-transform-modules-systemjs": "7.29.4",
+    "fast-uri": "3.1.2",
+    "qs": "6.15.2"
   },
   "devDependencies": {
     "@types/bootstrap": "^5.2.5",
