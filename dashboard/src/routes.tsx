@@ -1,6 +1,7 @@
 import App from "App";
 import AdminGuard from "pages/admin/AdminGuard";
 import AdminPage from "pages/admin/AdminPage";
+import AdminDebugPage from "pages/admin/debug/AdminDebugPage";
 import AdminServersPage from "pages/admin/servers/AdminServersPage";
 import AdminSubscriptionPage from "pages/admin/subscriptions/AdminSubscriptionPage";
 import AdminSubscriptionsPage from "pages/admin/subscriptions/AdminSubscriptionsPage";
@@ -57,6 +58,7 @@ const routes = createRoutesFromElements(
           />
           <Route path="servers" element={<AdminServersPage />} />
           <Route path="subscriptions" element={<AdminSubscriptionsPage />} />
+          <Route path="debug" element={<AdminDebugPage />} />
           <Route
             path="subscriptions/:subscriptionId"
             element={<AdminSubscriptionPage />}

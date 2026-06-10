@@ -29,8 +29,7 @@ export const HeaderNavbar = styled(Navbar)`
   .navbar-nav {
     .nav-link.active,
     a.active {
-      background-color: ${({ theme }) =>
-        theme.nav.activeBackground} !important;
+      background-color: ${({ theme }) => theme.nav.activeBackground} !important;
       color: ${({ theme }) => theme.primary} !important;
     }
   }
@@ -159,8 +158,7 @@ export const HeaderNavLink = styled(NavLink)`
 
   &.active {
     color: ${({ theme }) => theme.primary} !important;
-    background-color: ${({ theme }) =>
-      theme.nav.activeBackground} !important;
+    background-color: ${({ theme }) => theme.nav.activeBackground} !important;
   }
 
   &.text-danger {

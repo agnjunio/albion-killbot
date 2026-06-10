@@ -17,6 +17,7 @@ import {
   getUserPictureUrl,
 } from "helpers/discord";
 import { useMediaQuery } from "helpers/hooks";
+import { useAdminNavMobile } from "helpers/adminNavMobile";
 import { useServerNavMobile } from "helpers/serverNavMobile";
 import theme from "helpers/theme";
 import { Button, Dropdown, Nav, Navbar } from "react-bootstrap";
@@ -111,10 +112,14 @@ const Header = () => {
   const [logout] = useLogoutMutation();
   const location = useLocation();
   const serverNavMobile = useServerNavMobile();
+  const adminNavMobile = useAdminNavMobile();
   const isMobile = useMediaQuery("(max-width: 992px)");
   const isServerDashboard = /^\/dashboard\/[^/]+/.test(location.pathname);
+  const isAdminDashboard = /^\/admin(?:\/|$)/.test(location.pathname);
   const showServerNavButton =
     isMobile && isServerDashboard && Boolean(serverNavMobile);
+  const showAdminNavButton =
+    isMobile && isAdminDashboard && Boolean(adminNavMobile);
 
   const doLogout = async (event: React.MouseEvent<HTMLElement>) => {
     event.preventDefault();
@@ -204,11 +209,7 @@ const Header = () => {
       />
       {isFetching ? (
         <NavLoaderSlot>
-          <Loader
-            width={220}
-            height={20}
-            foregroundColor={theme.secondary}
-          >
+          <Loader width={220} height={20} foregroundColor={theme.secondary}>
             <rect x="0" y="2" rx="3" ry="3" width="120" height="16" />
           </Loader>
         </NavLoaderSlot>
@@ -255,6 +256,15 @@ const Header = () => {
               <FontAwesomeIcon icon={faBars} />
             </HeaderServerNavButton>
           )}
+          {showAdminNavButton && (
+            <HeaderServerNavButton
+              type="button"
+              aria-label="Open admin navigation"
+              onClick={() => adminNavMobile?.openAdminNav()}
+            >
+              <FontAwesomeIcon icon={faBars} />
+            </HeaderServerNavButton>
+          )}
 
           <HeaderBrand as={NavLink} to="/">
             <img src={logo} alt="Albion Killbot" />
@@ -271,10 +281,7 @@ const Header = () => {
           )}
         </Navbar.Toggle>
 
-        <Navbar.Collapse
-          id="header-navbar-nav"
-          className="justify-content-end"
-        >
+        <Navbar.Collapse id="header-navbar-nav" className="justify-content-end">
           {isMobile ? renderMobileNav(user) : renderDesktopNav(user)}
         </Navbar.Collapse>
       </HeaderNavbar>

@@ -40,45 +40,45 @@ const Search = ({ limits }: ISearchProps) => {
             <div className="search-form-field">
               <Form.Label>Add to notification list</Form.Label>
               <InputGroup className="search-input-group">
-              <Form.Control
-                type="text"
-                size="sm"
-                aria-describedby="search-help"
-                placeholder="Search Albion Online by name or ID"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-              />
-              <div className="search-input-actions">
-                <Dropdown className="search-server-dropdown">
-                  <Dropdown.Toggle
-                    className="search-server-toggle"
+                <Form.Control
+                  type="text"
+                  size="sm"
+                  aria-describedby="search-help"
+                  placeholder="Search Albion Online by name or ID"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                />
+                <div className="search-input-actions">
+                  <Dropdown className="search-server-dropdown">
+                    <Dropdown.Toggle
+                      className="search-server-toggle"
+                      variant="primary"
+                      size="sm"
+                    >
+                      {server?.name}
+                    </Dropdown.Toggle>
+
+                    <Dropdown.Menu>
+                      {servers.map((server) => (
+                        <Dropdown.Item
+                          key={server.id}
+                          onClick={() => setServer(server)}
+                        >
+                          {server.name}
+                        </Dropdown.Item>
+                      ))}
+                    </Dropdown.Menu>
+                  </Dropdown>
+                  <Button
+                    className="search-input-submit"
                     variant="primary"
                     size="sm"
+                    type="submit"
+                    aria-label="Search"
                   >
-                    {server?.name}
-                  </Dropdown.Toggle>
-
-                  <Dropdown.Menu>
-                    {servers.map((server) => (
-                      <Dropdown.Item
-                        key={server.id}
-                        onClick={() => setServer(server)}
-                      >
-                        {server.name}
-                      </Dropdown.Item>
-                    ))}
-                  </Dropdown.Menu>
-                </Dropdown>
-                <Button
-                  className="search-input-submit"
-                  variant="primary"
-                  size="sm"
-                  type="submit"
-                  aria-label="Search"
-                >
-                  <FontAwesomeIcon icon={faSearch} />
-                </Button>
-              </div>
+                    <FontAwesomeIcon icon={faSearch} />
+                  </Button>
+                </div>
               </InputGroup>
             </div>
             <Form.Text id="search-help" muted>

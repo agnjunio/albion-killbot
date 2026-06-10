@@ -119,6 +119,11 @@ async function getPlayer(playerId, { server }) {
   return res.data;
 }
 
+async function getPlayerKills(playerId, { server }) {
+  const res = await albionApiClient.get(`${PLAYERS_ENDPOINT}/${playerId}/kills`, { server });
+  return res.data;
+}
+
 async function getGuild(guildId, { server }) {
   const res = await albionApiClient.get(`${GUILDS_ENDPOINT}/${guildId}`, { server });
   return res.data;
@@ -174,6 +179,7 @@ module.exports = {
   getEvents,
   getGuild,
   getPlayer,
+  getPlayerKills,
   getPlayerFame,
   getStatistics,
   search,

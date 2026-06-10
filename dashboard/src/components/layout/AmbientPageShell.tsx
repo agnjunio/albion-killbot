@@ -17,7 +17,10 @@ interface AmbientPageShellProps {
   compact?: boolean;
 }
 
-const AmbientPageShell = ({ children, compact = false }: AmbientPageShellProps) => {
+const AmbientPageShell = ({
+  children,
+  compact = false,
+}: AmbientPageShellProps) => {
   const PageBody = compact ? AmbientCompactPageBody : AmbientPageBody;
 
   return (

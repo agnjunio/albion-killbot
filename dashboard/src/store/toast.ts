@@ -121,6 +121,34 @@ export const toastSlice = createSlice({
     );
 
     builder.addMatcher(
+      admin.endpoints.publishAdminEvents.matchFulfilled,
+      (state, action) => {
+        const { published, failed } = action.payload;
+        const failedSuffix =
+          failed.length > 0
+            ? ` ${failed.length} event(s) could not be loaded.`
+            : "";
+
+        state.push({
+          id: uid(),
+          theme: failed.length > 0 ? "warning" : "success",
+          message: `Published ${published} kill event(s).${failedSuffix}`,
+        });
+      }
+    );
+    builder.addMatcher(
+      admin.endpoints.publishAdminEvents.matchRejected,
+      (state, action) => {
+        if (!isRejectedWithValue(action)) return;
+        state.push({
+          id: uid(),
+          theme: "danger",
+          message: "Failed to publish kill events. Please try again later.",
+        });
+      }
+    );
+
+    builder.addMatcher(
       admin.endpoints.createAdminSubscription.matchFulfilled,
       (state) => {
         state.push({

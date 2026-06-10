@@ -19,7 +19,10 @@ export const PriceCardRoot = styled(Card)<{ $popular?: boolean }>`
   transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 
   &:hover {
-    border-color: rgba(${({ theme }) => theme.rgb?.primary ?? "255,189,89"}, 0.28);
+    border-color: rgba(
+      ${({ theme }) => theme.rgb?.primary ?? "255,189,89"},
+      0.28
+    );
     box-shadow: 0 10px 28px rgb(0 0 0 / 28%);
     transform: translateY(-2px);
   }

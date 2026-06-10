@@ -56,6 +56,8 @@ interface UnsavedChangesBarProps {
   title?: string;
   description?: string;
   saveLabel?: string;
+  savingLabel?: string;
+  resetLabel?: string;
 }
 
 const UnsavedChangesBar = ({
@@ -66,6 +68,8 @@ const UnsavedChangesBar = ({
   title = "Unsaved changes",
   description = "Save to apply your changes on Discord.",
   saveLabel = "Save changes",
+  savingLabel = "Saving...",
+  resetLabel = "Reset",
 }: UnsavedChangesBarProps) => {
   if (!show) return null;
 
@@ -80,10 +84,10 @@ const UnsavedChangesBar = ({
           </SaveBarMessage>
           <Stack direction="horizontal" gap={2} className="ms-auto">
             <Button variant="secondary" disabled={isSaving} onClick={onReset}>
-              Reset
+              {resetLabel}
             </Button>
             <Button variant="primary" disabled={isSaving} onClick={onSave}>
-              {isSaving ? "Saving..." : saveLabel}
+              {isSaving ? savingLabel : saveLabel}
             </Button>
           </Stack>
         </SaveBarInner>

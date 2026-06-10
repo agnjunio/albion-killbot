@@ -1,3 +1,8 @@
+import {
+  AdminPlayerKills,
+  AdminPublishEventsRequest,
+  AdminPublishEventsResponse,
+} from "types/admin";
 import { PaginatedResponse } from "types/pagination";
 import { ServerPartial } from "types/server";
 import { ISubscription, ISubscriptionExtended } from "types/subscription";
@@ -13,6 +18,26 @@ import {
 
 const admin = api.injectEndpoints({
   endpoints: (builder) => ({
+    fetchAdminPlayerKills: builder.query<
+      AdminPlayerKills,
+      { playerId: string; server: string }
+    >({
+      query: ({ playerId, server }) => ({
+        url: `/admin/debug/players/${playerId}`,
+        params: { server },
+      }),
+      providesTags: ["Admin"],
+    }),
+    publishAdminEvents: builder.mutation<
+      AdminPublishEventsResponse,
+      AdminPublishEventsRequest
+    >({
+      query: (body) => ({
+        url: `/admin/debug/events/publish`,
+        method: "POST",
+        body,
+      }),
+    }),
     fetchAdminServers: builder.query<
       PaginatedResponse<ServerPartial>,
       IFindAdminServers
@@ -84,6 +109,8 @@ const admin = api.injectEndpoints({
 });
 
 export const {
+  useLazyFetchAdminPlayerKillsQuery,
+  usePublishAdminEventsMutation,
   useLazyFetchAdminServersQuery,
   useDoLeaveServerMutation,
 

@@ -87,7 +87,11 @@ const SubscriptionListItem = ({
           xl={4}
           className="actions d-flex align-items-start justify-content-end"
         >
-          <Stack gap={2} direction="horizontal" className="flex-wrap justify-content-end">
+          <Stack
+            gap={2}
+            direction="horizontal"
+            className="flex-wrap justify-content-end"
+          >
             <Link to={`/admin/subscriptions/${subscription.id}`}>
               <Button variant="primary">Manage</Button>
             </Link>

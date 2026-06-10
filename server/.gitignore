@@ -105,6 +105,7 @@ dist
 
 # Debug files
 debug.js
+!src/services/debug.js
 debug/
 
 # Local config files

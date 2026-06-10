@@ -38,7 +38,8 @@ const ServerList = ({
 }: ServerListProps) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const isServerPaginated = controlledPage !== undefined && onPageChange !== undefined;
+  const isServerPaginated =
+    controlledPage !== undefined && onPageChange !== undefined;
 
   const [width, setWidth] = useState(window.innerWidth);
   const PAGE_GAP = 2 + Math.floor(width / 450);

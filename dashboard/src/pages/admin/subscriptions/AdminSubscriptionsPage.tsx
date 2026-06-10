@@ -8,7 +8,6 @@ import {
   AdminDropdownMenu,
   AdminFilterFooter,
   AdminFilterPanel,
-  AdminSectionTitle,
 } from "pages/admin/styles";
 import { useCallback, useEffect } from "react";
 import { Button, Card, Col, Dropdown, Form, Row, Stack } from "react-bootstrap";
@@ -53,8 +52,6 @@ const AdminSubscriptionsPage = () => {
 
   return (
     <Stack gap={3}>
-      <AdminSectionTitle>Subscriptions</AdminSectionTitle>
-
       <Form
         onSubmit={(e) => {
           e?.preventDefault();

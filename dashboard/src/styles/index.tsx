@@ -726,8 +726,7 @@ const globalStyle = createGlobalStyle<{ theme: ThemeProps }>`
   .navbar-nav {
     .nav-link.active,
     a.active {
-      background-color: ${({ theme }) =>
-        theme.nav.activeBackground} !important;
+      background-color: ${({ theme }) => theme.nav.activeBackground} !important;
       color: ${({ theme }) => theme.primary} !important;
     }
   }

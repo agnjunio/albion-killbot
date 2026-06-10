@@ -66,15 +66,14 @@ const DashboardManageableServerCard = ({ server, onInvite }: Props) => {
           }
           onClick={handleIconClick}
         >
-          <DashboardServerIcon
-            src={getServerPictureUrl(server, true)}
-            alt=""
-          />
+          <DashboardServerIcon src={getServerPictureUrl(server, true)} alt="" />
         </DashboardServerIconButton>
       </DashboardServerHero>
 
       <DashboardServerBody>
-        <DashboardServerName title={server.name}>{server.name}</DashboardServerName>
+        <DashboardServerName title={server.name}>
+          {server.name}
+        </DashboardServerName>
       </DashboardServerBody>
 
       <DashboardServerFooter>

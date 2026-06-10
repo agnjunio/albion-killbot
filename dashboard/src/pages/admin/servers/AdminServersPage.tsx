@@ -2,7 +2,7 @@ import { faRefresh } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Loader from "components/common/Loader";
 import ServerList from "components/ServerList";
-import { AdminFilterPanel, AdminSectionTitle } from "pages/admin/styles";
+import { AdminFilterPanel } from "pages/admin/styles";
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { Button, Card, Form, InputGroup, Stack } from "react-bootstrap";
 import { useLazyFetchAdminServersQuery } from "store/api/admin";
@@ -71,8 +71,6 @@ const AdminServersPage = () => {
 
   return (
     <Stack gap={3}>
-      <AdminSectionTitle>Servers</AdminSectionTitle>
-
       <AdminFilterPanel>
         <Card.Body>
           <Form onSubmit={handleSearch}>

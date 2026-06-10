@@ -20,7 +20,10 @@ const BASE_HEIGHT = 1250;
 const ATTUNEMENT_HEIGHT = 250;
 const PARTICIPANT_BARS_Y = 1100;
 
-async function generateEventImage(event, { showAttunement = true, splitLootValue = false, includeInventory = false } = {}) {
+async function generateEventImage(
+  event,
+  { showAttunement = true, splitLootValue = false, includeInventory = false } = {},
+) {
   const cacheKey = includeInventory ? `eventImage-${event.EventId}-combined` : `eventImage-${event.EventId}`;
 
   return memoize(

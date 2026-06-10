@@ -108,6 +108,26 @@ async function getPlayer(playerId, { server = SERVER_DEFAULT, silent = false }) 
   }
 }
 
+async function getPlayerKills(playerId, { server = SERVER_DEFAULT, silent = false }) {
+  try {
+    logger.verbose(`Fetch ${server.name} player kills: ${playerId}`);
+    const kills = await albionApiClient.getPlayerKills(playerId, { server });
+    return kills.map((event) => {
+      event.server = server;
+      return event;
+    });
+  } catch (error) {
+    if (!silent)
+      logger.error(`Failed to fetch ${server.name} player kills [${playerId}]: ${error.message}`, {
+        error,
+        server,
+        silent,
+        playerId,
+      });
+    return null;
+  }
+}
+
 async function getGuild(guildId, { server = SERVER_DEFAULT, rankings = false, silent = false }) {
   try {
     logger.verbose(`Fetch ${server.name} guild: ${guildId}`, { server, rankings, silent });
@@ -314,5 +334,6 @@ module.exports = {
   getItemFile,
   getLootValue,
   getPlayer,
+  getPlayerKills,
   search,
 };

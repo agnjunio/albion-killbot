@@ -33,8 +33,7 @@ export const PremiumPanel = styled.div`
     );
   border: 1px solid
     rgba(${({ theme }) => theme.rgb?.primary ?? "255,189,89"}, 0.18);
-  box-shadow: 0 12px 32px rgb(0 0 0 / 35%),
-    0 0 0 1px rgba(255, 255, 255, 0.04);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 35%), 0 0 0 1px rgba(255, 255, 255, 0.04);
 
   @media (min-width: ${({ theme }) => theme.layout.breakpoints.md}) {
     padding: ${({ theme }) => theme.layout.padding.panel.md};

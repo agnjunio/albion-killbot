@@ -8,6 +8,71 @@ router.use(admin);
 
 /**
  * @openapi
+ * /admin/debug/players/{playerId}:
+ *   get:
+ *     tags: [Admin]
+ *     summary: Fetch recent kills for an Albion player
+ *     operationId: getAdminDebugPlayerKills
+ *     parameters:
+ *     - name: playerId
+ *       in: path
+ *       required: true
+ *       schema:
+ *         type: string
+ *     - name: server
+ *       in: query
+ *       schema:
+ *         type: string
+ *         enum: ["americas", "asia", "europe"]
+ *         default: "americas"
+ *     responses:
+ *       200:
+ *         description: Recent kills
+ *       400:
+ *         description: Invalid server
+ *       403:
+ *         description: Unable to authenticate
+ *       500:
+ *         description: Internal error
+ */
+router.get(`/debug/players/:playerId`, adminController.getDebugPlayerKills);
+
+/**
+ * @openapi
+ * /admin/debug/events/publish:
+ *   post:
+ *     tags: [Admin]
+ *     summary: Publish kill events to the bot queue
+ *     operationId: publishAdminDebugEvents
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [eventIds]
+ *             properties:
+ *               server:
+ *                 type: string
+ *                 enum: ["americas", "asia", "europe"]
+ *                 default: "americas"
+ *               eventIds:
+ *                 type: array
+ *                 items:
+ *                   type: integer
+ *     responses:
+ *       200:
+ *         description: Publish result
+ *       400:
+ *         description: Invalid request
+ *       403:
+ *         description: Unable to authenticate
+ *       500:
+ *         description: Internal error
+ */
+router.post(`/debug/events/publish`, adminController.publishDebugEvents);
+
+/**
+ * @openapi
  * /admin/servers:
  *   get:
  *     tags: [Admin]

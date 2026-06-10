@@ -30,7 +30,7 @@ async function getServers(accessToken) {
     const botPresence = await discord.hasBotInGuilds(adminServers.map((server) => server.id));
 
     return servers.map((server) => {
-      server.bot = isAdminServer(server) ? (botPresence[server.id] ?? false) : false;
+      server.bot = isAdminServer(server) ? botPresence[server.id] ?? false : false;
       return server;
     });
   } catch (error) {

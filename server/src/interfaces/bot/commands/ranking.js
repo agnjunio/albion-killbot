@@ -39,11 +39,9 @@ const command = {
       return await interaction.editReply(t("RANKING.NO_DATA"));
     }
 
-    await deleteMatchingMessages(
-      interaction.channel,
-      (message) => Markers.isRankingMessage(message, { type }),
-      { reason: `${type} ranking` },
-    );
+    await deleteMatchingMessages(interaction.channel, (message) => Markers.isRankingMessage(message, { type }), {
+      reason: `${type} ranking`,
+    });
     return await interaction.editReply(embedRanking(ranking, { locale: settings.general.locale }));
   },
 };

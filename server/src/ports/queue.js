@@ -19,6 +19,7 @@ async function publish(exchange, data) {
       exchange,
       error,
     });
+    throw error;
   }
 }
 

@@ -482,8 +482,7 @@ export const NavItemLink = styled(NavLink)`
     border-color 0.2s ease;
 
   &.active {
-    background-color: ${({ theme }) =>
-      theme.nav.activeBackground} !important;
+    background-color: ${({ theme }) => theme.nav.activeBackground} !important;
     border-left-color: ${({ theme }) => theme.nav.activeBorder};
     color: ${({ theme }) => theme.primary} !important;
   }

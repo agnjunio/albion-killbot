@@ -52,7 +52,9 @@ const DashboardOtherServers = ({ servers }: Props) => {
                 alt={server.name}
               />
               <OtherServerInfo>
-                <OtherServerName title={server.name}>{server.name}</OtherServerName>
+                <OtherServerName title={server.name}>
+                  {server.name}
+                </OtherServerName>
                 <OtherServerMeta>View only</OtherServerMeta>
               </OtherServerInfo>
               <OtherServerLock>

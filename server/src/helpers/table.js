@@ -1,13 +1,5 @@
-const {
-  DISCORD_EMBED_FIELD_VALUE_MAX,
-  DISCORD_MESSAGE_CONTENT_MAX,
-  truncateDiscordText,
-} = require("./discordLimits");
-const {
-  monospaceDisplayWidth,
-  padMonospace,
-  truncatePlainTextEllipsis,
-} = require("./string");
+const { DISCORD_EMBED_FIELD_VALUE_MAX, DISCORD_MESSAGE_CONTENT_MAX, truncateDiscordText } = require("./discordLimits");
+const { monospaceDisplayWidth, padMonospace, truncatePlainTextEllipsis } = require("./string");
 
 function cellText(col, row, rowIndex) {
   const value = row[col.accessor];
@@ -31,8 +23,7 @@ function columnWidth(col, colIndex, rows, headers) {
   let width = col.minLength ?? 1;
   const bump = (text) => {
     const displayLen = monospaceDisplayWidth(text);
-    const len =
-      col.truncate !== undefined && displayLen > col.truncate ? col.truncate : displayLen;
+    const len = col.truncate !== undefined && displayLen > col.truncate ? col.truncate : displayLen;
     width = Math.max(width, len);
   };
 
@@ -48,9 +39,7 @@ function columnWidth(col, colIndex, rows, headers) {
 }
 
 function formatLine(columns, widths, values) {
-  return columns
-    .map((col, i) => formatCell(values[i], widths[i], col.alignment, col.truncate))
-    .join(" ");
+  return columns.map((col, i) => formatCell(values[i], widths[i], col.alignment, col.truncate)).join(" ");
 }
 
 function formatTableLines(columns, rows, options) {

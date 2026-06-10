@@ -1,7 +1,43 @@
 const moment = require("moment");
 const logger = require("../../../helpers/logger");
+const debugService = require("../../../services/debug");
 const serversService = require("../../../services/servers");
 const subscriptionsService = require("../../../services/subscriptions");
+
+async function publishDebugEvents(req, res) {
+  const { server, eventIds } = req.body;
+
+  if (!Array.isArray(eventIds) || eventIds.length === 0) return res.sendStatus(400);
+
+  try {
+    const result = await debugService.publishEvents({ server, eventIds });
+    if (!result) return res.sendStatus(400);
+
+    return res.send(result);
+  } catch (error) {
+    logger.error(`Unable to publish admin debug events: ${error.message}`, { error, server, eventIds });
+    return res.sendStatus(500);
+  }
+}
+
+async function getDebugPlayerKills(req, res) {
+  const { playerId } = req.params;
+  const { server } = req.query;
+
+  try {
+    const result = await debugService.fetchPlayerKills({ playerId, server });
+    if (!result) return res.sendStatus(400);
+
+    return res.send(result);
+  } catch (error) {
+    logger.error(`Unable to fetch admin debug player kills: ${error.message}`, {
+      error,
+      playerId,
+      server,
+    });
+    return res.sendStatus(500);
+  }
+}
 
 async function getServers(req, res) {
   const { search, page, pageSize } = req.query;
@@ -130,6 +166,8 @@ async function deleteSubscription(req, res) {
 }
 
 module.exports = {
+  getDebugPlayerKills,
+  publishDebugEvents,
   getServers,
   leaveServer,
 

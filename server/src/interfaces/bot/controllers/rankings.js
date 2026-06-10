@@ -64,11 +64,9 @@ async function displayRankings(client, rankingType) {
         type,
         rankings,
       });
-      await deleteMatchingMessages(
-        rankingChannel,
-        (message) => Markers.isRankingMessage(message, { type }),
-        { reason: `${type} ranking` },
-      );
+      await deleteMatchingMessages(rankingChannel, (message) => Markers.isRankingMessage(message, { type }), {
+        reason: `${type} ranking`,
+      });
       await sendNotification(
         client,
         channel,

@@ -66,7 +66,7 @@ const sendEvent = async ({ client, server, guild, event, settings, track, limits
 
   let channel = setting.channel;
   if (type === EVENT_TYPES.KILLS || type === EVENT_TYPES.DEATHS || type === EVENT_TYPES.ASSISTS) {
-    channel = (trackItem?.[type]?.channel) || channel;
+    channel = trackItem?.[type]?.channel || channel;
   } else if (type === "juicy") {
     channel = setting[juicy].channel;
   }
