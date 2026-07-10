@@ -39,7 +39,7 @@
     "minimist": "^1.2.6",
     "moment": "^2.29.4",
     "mongodb": "^4.17.0",
-    "morgan": "^1.10.1",
+    "morgan": "^1.11.0",
     "sharp": "^0.32.6",
     "stripe": "^9.8.0",
     "swagger-jsdoc": "^6.2.1",
