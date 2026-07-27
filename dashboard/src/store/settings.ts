@@ -29,6 +29,11 @@ const defaultSettings: ISettings = {
     channel: "",
     mode: "image",
   },
+  depths: {
+    enabled: false,
+    channel: "",
+    mode: "image",
+  },
   juicy: {
     enabled: {
       americas: false,
@@ -75,6 +80,7 @@ export const settingsSlice = createSlice({
       state.kills = action.payload.kills;
       state.deaths = action.payload.deaths;
       state.assists = action.payload.assists ?? defaultSettings.assists;
+      state.depths = action.payload.depths ?? defaultSettings.depths;
       state.juicy = action.payload.juicy;
       state.battles = action.payload.battles;
       state.rankings = action.payload.rankings;
@@ -146,6 +152,22 @@ export const settingsSlice = createSlice({
     },
     setAssistsProvider: (state, action: PayloadAction<string>) => {
       state.assists.provider = action.payload;
+      state.changed = true;
+    },
+    setDepthsEnabled: (state, action: PayloadAction<boolean>) => {
+      state.depths.enabled = action.payload;
+      state.changed = true;
+    },
+    setDepthsChannel: (state, action: PayloadAction<string>) => {
+      state.depths.channel = action.payload;
+      state.changed = true;
+    },
+    setDepthsMode: (state, action: PayloadAction<string>) => {
+      state.depths.mode = action.payload;
+      state.changed = true;
+    },
+    setDepthsProvider: (state, action: PayloadAction<string>) => {
+      state.depths.provider = action.payload;
       state.changed = true;
     },
     setJuicyEnabled: (
@@ -245,6 +267,10 @@ export const {
   setAssistsChannel,
   setAssistsMode,
   setAssistsProvider,
+  setDepthsEnabled,
+  setDepthsChannel,
+  setDepthsMode,
+  setDepthsProvider,
   setJuicyEnabled,
   setJuicyChannel,
   setJuicyMode,

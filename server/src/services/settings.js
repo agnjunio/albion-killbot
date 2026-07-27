@@ -29,6 +29,11 @@ const DEFAULT_SETTINGS = Object.freeze({
     channel: null,
     mode: REPORT_MODES.IMAGE,
   },
+  depths: {
+    enabled: false,
+    channel: null,
+    mode: REPORT_MODES.IMAGE,
+  },
   juicy: {
     enabled: {},
     mode: REPORT_MODES.IMAGE,
@@ -57,7 +62,17 @@ const DEFAULT_SETTINGS = Object.freeze({
   },
 });
 
-const generateSettings = (settings) => mergeObjects(clone(DEFAULT_SETTINGS), settings);
+// A stored category can be null (e.g. an older client PUT a settings object missing a
+// newly added category, which Mongo persists as null instead of just omitting the key).
+// mergeObjects only fills in defaults for missing keys, not null ones, so drop those here
+// first to fall back to DEFAULT_SETTINGS instead of crashing on a null category downstream.
+const generateSettings = (settings) => {
+  const sanitizedSettings = { ...settings };
+  for (const category of Object.keys(DEFAULT_SETTINGS)) {
+    if (sanitizedSettings[category] === null) delete sanitizedSettings[category];
+  }
+  return mergeObjects(clone(DEFAULT_SETTINGS), sanitizedSettings);
+};
 
 async function getSettings(serverId) {
   return await memoize(
@@ -78,14 +93,18 @@ async function fetchAllSettings() {
 
 async function setSettings(serverId, data) {
   // TODO: Schema validation
-  const { general, kills, deaths, assists, juicy, battles, rankings } = data;
+  const { general, kills, deaths, assists, depths, juicy, battles, rankings } = data;
 
-  await updateOne(
-    SETTINGS_COLLECTION,
-    { server: serverId },
-    { $set: { server: serverId, general, kills, deaths, assists, juicy, battles, rankings } },
-    { upsert: true },
-  );
+  // Mongo persists $set fields that are undefined (e.g. a client missing a newly added
+  // category) as null instead of leaving them out, corrupting the stored document for
+  // every future read. Drop undefined categories here so we never write that in the first
+  // place; generateSettings() still heals any documents already affected by this.
+  const update = { server: serverId, general, kills, deaths, assists, depths, juicy, battles, rankings };
+  for (const key of Object.keys(update)) {
+    if (update[key] === undefined) delete update[key];
+  }
+
+  await updateOne(SETTINGS_COLLECTION, { server: serverId }, { $set: update }, { upsert: true });
   remove(`settings-${serverId}`);
   return await getSettings(serverId);
 }

@@ -11,6 +11,10 @@ import {
   setDeathsEnabled,
   setDeathsMode,
   setDeathsProvider,
+  setDepthsChannel,
+  setDepthsEnabled,
+  setDepthsMode,
+  setDepthsProvider,
   setKillsChannel,
   setKillsEnabled,
   setKillsMode,
@@ -19,7 +23,7 @@ import {
 import { IConstants } from "types/constants";
 import { IChannel } from "types/server";
 
-export type NotificationSettingsType = "kills" | "assists" | "deaths";
+export type NotificationSettingsType = "kills" | "assists" | "deaths" | "depths";
 
 interface NotificationSettingsFormProps {
   type: NotificationSettingsType;
@@ -27,6 +31,7 @@ interface NotificationSettingsFormProps {
   channels: IChannel[];
   modes: IConstants["modes"];
   providers: IConstants["providers"];
+  disabled?: boolean;
 }
 
 const notificationConfig = {
@@ -51,6 +56,13 @@ const notificationConfig = {
     setMode: setDeathsMode,
     setProvider: setDeathsProvider,
   },
+  depths: {
+    channelAriaLabel: "Depths channel",
+    setEnabled: setDepthsEnabled,
+    setChannel: setDepthsChannel,
+    setMode: setDepthsMode,
+    setProvider: setDepthsProvider,
+  },
 } as const;
 
 const NotificationSettingsForm = ({
@@ -59,6 +71,7 @@ const NotificationSettingsForm = ({
   channels,
   modes,
   providers,
+  disabled = false,
 }: NotificationSettingsFormProps) => {
   const dispatch = useAppDispatch();
   const settings = useAppSelector((state) => state.settings[type]);
@@ -77,13 +90,14 @@ const NotificationSettingsForm = ({
         serverId={serverId}
         notificationType={type}
         testMode={settings.mode}
+        disabled={disabled}
       />
 
       <Form.Group controlId={`${type}-mode`}>
         <Form.Label>Mode</Form.Label>
         <Form.Select
           aria-label="Notification mode"
-          disabled={!settings.enabled}
+          disabled={disabled || !settings.enabled}
           value={settings.mode}
           onChange={(e) => dispatch(config.setMode(e.target.value))}
         >
@@ -99,7 +113,7 @@ const NotificationSettingsForm = ({
         <Form.Label>Link Provider</Form.Label>
         <Form.Select
           aria-label="Links provider"
-          disabled={!settings.enabled}
+          disabled={disabled || !settings.enabled}
           value={settings.provider}
           onChange={(e) => dispatch(config.setProvider(e.target.value))}
         >

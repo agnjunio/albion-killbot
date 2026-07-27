@@ -4,9 +4,28 @@ const albion = require("../ports/albion");
 const { publish, subscribe } = require("../ports/queue");
 const logger = require("../helpers/logger");
 const { sleep } = require("../helpers/scheduler");
+const { isDepthsKill } = require("../helpers/albion");
 
 const EVENTS_EXCHANGE = "events";
 const EVENTS_QUEUE_PREFIX = "events";
+
+// Tags an event with any derived data before it's published: juicy kill loot-value/tier,
+// and Depths detection. Anything that fetches events for publishing should run this first,
+// regardless of whether it goes through fetchEventsTo or a one-off lookup like getEvent.
+async function preprocessEvent(event, { server }) {
+  if (config.get("features.juicy.enabled") && event.TotalVictimKillFame > config.get("features.juicy.minFame")) {
+    event.lootValue = await getEventVictimLootValue(event, { server });
+    if (event.lootValue) {
+      const lootSum = event.lootValue.equipment + event.lootValue.inventory;
+      if (lootSum >= config.get("features.juicy.goodLootValue")) event.juicy = "good";
+      if (lootSum >= config.get("features.juicy.insaneLootValue")) event.juicy = "insane";
+    }
+  }
+
+  if (isDepthsKill(event)) event.Location = "Depths";
+
+  return event;
+}
 
 async function fetchEvents({ server, offset, limit = 51 }) {
   try {
@@ -64,16 +83,8 @@ async function fetchEventsTo(latestEventId, { server, offset = 0, silent = false
       return true;
     });
 
-    // Prefetch lootValue if it's a juicy kill
     for (const evt of events) {
-      if (config.get("features.juicy.enabled") && evt.TotalVictimKillFame > config.get("features.juicy.minFame")) {
-        evt.lootValue = await getEventVictimLootValue(evt, { server });
-        if (evt.lootValue) {
-          const lootSum = evt.lootValue.equipment + evt.lootValue.inventory;
-          if (lootSum >= config.get("features.juicy.goodLootValue")) evt.juicy = "good";
-          if (lootSum >= config.get("features.juicy.insaneLootValue")) evt.juicy = "insane";
-        }
-      }
+      await preprocessEvent(evt, { server });
     }
 
     return foundLatest
@@ -123,6 +134,7 @@ module.exports = {
   fetchEventsTo,
   getEvent,
   getEventVictimLootValue,
+  preprocessEvent,
   publishEvent,
   subscribeEvents,
   isInvalidEvent,

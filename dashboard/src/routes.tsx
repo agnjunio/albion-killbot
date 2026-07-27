@@ -11,6 +11,7 @@ import DashboardPage from "pages/dashboard/DashboardPage";
 import AssistsPage from "pages/dashboard/server/AssistsPage";
 import BattlesPage from "pages/dashboard/server/BattlesPage";
 import DeathsPage from "pages/dashboard/server/DeathsPage";
+import DepthsPage from "pages/dashboard/server/DepthsPage";
 import JuicyPage from "pages/dashboard/server/JuicyPage";
 import KillsPage from "pages/dashboard/server/KillsPage";
 import RankingsPage from "pages/dashboard/server/RankingsPage";
@@ -39,6 +40,7 @@ const routes = createRoutesFromElements(
             <Route path="kills" element={<KillsPage />} />
             <Route path="assists" element={<AssistsPage />} />
             <Route path="deaths" element={<DeathsPage />} />
+            <Route path="depths" element={<DepthsPage />} />
             <Route path="juicy" element={<JuicyPage />} />
             <Route path="battles" element={<BattlesPage />} />
             <Route path="rankings" element={<RankingsPage />} />

@@ -185,6 +185,19 @@ router.use(`/:serverId`, serverAdmin);
  *              provider:
  *                type: string
  *                description: Provider for links in the notifications
+ *        depths:
+ *          allOf:
+ *          - $ref: '#/components/schemas/Category'
+ *          - type: object
+ *            properties:
+ *              mode:
+ *                type: string
+ *                description: Notification style
+ *                default: "image"
+ *              provider:
+ *                type: string
+ *                description: Provider for links in the notifications
+ *          description: Notifications for kills that occurred in Depths, regardless of kill/death/assist. Premium only, disabled by default.
  *        juicy:
  *          allOf:
  *          - $ref: '#/components/schemas/Category'
@@ -435,7 +448,7 @@ router.put(`/:serverId/track`, serversController.setServerTrack);
  *             properties:
  *               type:
  *                 type: string
- *                 enum: [kills, deaths, assists]
+ *                 enum: [kills, deaths, assists, depths]
  *               mode:
  *                 type: string
  *                 enum: ["image", "text"]

@@ -4,7 +4,7 @@ const logger = require("../helpers/logger");
 const settingsService = require("./settings");
 const { embedEvent, embedEventImage, embedBattle, embedRanking } = require("../helpers/embeds");
 const { generateEventImage } = require("./images");
-const { EVENT_TYPES } = require("../helpers/constants");
+const { EVENT_CATEGORIES, EVENT_TYPES } = require("../helpers/constants");
 const FAKE_EVENT = require("../assets/mocks/event_934270718.json");
 const FAKE_GOOD_EVENT = require("../assets/mocks/event_1000422003.json");
 const FAKE_INSANE_EVENT = require("../assets/mocks/event_1000545635.json");
@@ -97,11 +97,11 @@ async function removeMemberRole(serverId, userId, roleId, reason) {
   }
 }
 
-async function testNotification(serverId, { channelId, type = EVENT_TYPES.KILLS, mode = "image" } = {}) {
+async function testNotification(serverId, { channelId, type: category = EVENT_CATEGORIES.KILLS, mode = "image" } = {}) {
   try {
     if (!channelId) {
       const settings = await settingsService.getSettings(serverId);
-      channelId = settings[type].channel;
+      channelId = settings[category].channel;
     }
 
     const actions = new Map();
@@ -116,17 +116,25 @@ async function testNotification(serverId, { channelId, type = EVENT_TYPES.KILLS,
     });
 
     let action;
-    switch (type) {
-      case EVENT_TYPES.KILLS:
-      case EVENT_TYPES.DEATHS:
+    switch (category) {
+      case EVENT_CATEGORIES.KILLS:
+      case EVENT_CATEGORIES.DEATHS:
         action = `event.${mode}`;
         if (!actions.has(action) || typeof actions.get(action) !== "function") throw new Error(`Unknown mode ${mode}`);
         return await actions.get(action)({
           ...FAKE_EVENT,
-          good: type === EVENT_TYPES.KILLS,
-          eventType: type,
+          type: category === EVENT_CATEGORIES.KILLS ? EVENT_TYPES.KILL : EVENT_TYPES.DEATH,
+          category,
         });
-      case EVENT_TYPES.ASSISTS: {
+      case EVENT_CATEGORIES.DEPTHS:
+        action = `event.${mode}`;
+        if (!actions.has(action) || typeof actions.get(action) !== "function") throw new Error(`Unknown mode ${mode}`);
+        return await actions.get(action)({
+          ...FAKE_EVENT,
+          type: EVENT_TYPES.KILL,
+          category: EVENT_CATEGORIES.DEPTHS,
+        });
+      case EVENT_CATEGORIES.ASSISTS: {
         action = `event.${mode}`;
         if (!actions.has(action) || typeof actions.get(action) !== "function") throw new Error(`Unknown mode ${mode}`);
         const assistPlayer = FAKE_INSANE_EVENT.Participants.find(
@@ -135,7 +143,8 @@ async function testNotification(serverId, { channelId, type = EVENT_TYPES.KILLS,
         );
         return await actions.get(action)({
           ...FAKE_INSANE_EVENT,
-          eventType: EVENT_TYPES.ASSISTS,
+          type: EVENT_TYPES.ASSIST,
+          category: EVENT_CATEGORIES.ASSISTS,
           assistPlayer,
         });
       }
@@ -154,7 +163,7 @@ async function testNotification(serverId, { channelId, type = EVENT_TYPES.KILLS,
         await discord.sendMessage(channelId, embedRanking(FAKE_PVP_RANKING, { test: true }));
         return true;
       default:
-        throw new Error(`Unkown type ${type}`);
+        throw new Error(`Unkown type ${category}`);
     }
   } catch (error) {
     if (axios.isAxiosError(error) && error.response.status === 403) {
@@ -163,7 +172,7 @@ async function testNotification(serverId, { channelId, type = EVENT_TYPES.KILLS,
     logger.error(`Error while sending test to server: ${error.message}`, {
       error,
       serverId,
-      type,
+      category,
     });
     throw error;
   }
