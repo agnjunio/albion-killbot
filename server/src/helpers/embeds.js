@@ -48,13 +48,14 @@ const getEventColor = (event) => {
         insane: COLORS.YELLOW,
       }[event.juicy] || COLORS.GREY
     );
-  if (event.eventType === EVENT_TYPES.ASSISTS) return COLORS.DARK_AMBER;
-  if (event.good !== undefined) return event.good ? COLORS.DARK_GREEN : COLORS.RED;
+  if (event.type === EVENT_TYPES.ASSIST) return COLORS.DARK_AMBER;
+  if (event.type === EVENT_TYPES.KILL) return COLORS.DARK_GREEN;
+  if (event.type === EVENT_TYPES.DEATH) return COLORS.RED;
   return COLORS.GREY;
 };
 
 const getEventTitle = (event, t, { guildTags = false } = {}) => {
-  const isDeath = event.eventType === EVENT_TYPES.DEATHS || event.good === false;
+  const isDeath = event.type === EVENT_TYPES.DEATH;
 
   return t(isDeath ? "KILL.DEATH_TITLE" : "KILL.KILL_TITLE", {
     killer: getPlayerName(event, "Killer", { guildTags }),

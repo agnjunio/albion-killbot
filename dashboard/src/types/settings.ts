@@ -25,6 +25,12 @@ export interface ISettings {
     mode: string;
     provider?: string;
   };
+  depths: {
+    enabled: boolean;
+    channel: string;
+    mode: string;
+    provider?: string;
+  };
   juicy: {
     enabled: {
       [serverId: string]: boolean;

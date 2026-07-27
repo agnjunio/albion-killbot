@@ -1,7 +1,7 @@
 const config = require("config");
 
 const logger = require("../../../helpers/logger");
-const { REPORT_MODES, EVENT_TYPES } = require("../../../helpers/constants");
+const { REPORT_MODES, EVENT_CATEGORIES, EVENT_TYPES } = require("../../../helpers/constants");
 const { getTrackedEvent } = require("../../../helpers/tracking");
 const { embedEvent, embedEventImage, embedEventInventoryImage } = require("../../../helpers/embeds");
 const { transformGuild } = require("../../../helpers/discord");
@@ -16,7 +16,7 @@ const { hasSubscriptionByServerId } = require("../../../services/subscriptions")
 
 const { sendNotification } = require("./notifications");
 
-const sendEvent = async ({ client, server, guild, event, settings, track, limits, type, premium = false } = {}) => {
+const sendEvent = async ({ client, server, guild, event, settings, track, limits, category, premium = false } = {}) => {
   const { juicy, trackItem } = event;
   if (!event.lootValue) event.lootValue = await getEventVictimLootValue(event, { server });
   const logMeta = {
@@ -26,17 +26,17 @@ const sendEvent = async ({ client, server, guild, event, settings, track, limits
     settings,
     track,
     limits,
-    type,
+    category,
   };
   let killType = "unknown";
-  if (type === EVENT_TYPES.KILLS) killType = "kill";
-  else if (type === EVENT_TYPES.DEATHS) killType = "death";
-  else if (type === EVENT_TYPES.ASSISTS) killType = "assist";
-  else if (type === "juicy") killType = juicy;
+  if (event.type === EVENT_TYPES.KILL) killType = "kill";
+  else if (event.type === EVENT_TYPES.DEATH) killType = "death";
+  else if (event.type === EVENT_TYPES.ASSIST) killType = "assist";
+  else if (category === EVENT_CATEGORIES.JUICY) killType = juicy;
 
   if (premium && !(await hasSubscriptionByServerId(guild.id))) return;
 
-  const setting = settings[type];
+  const setting = settings[category];
   if (!setting) {
     logger.debug(
       `[${server.name}] Skipping event ${event.EventId} to "${guild.name}" because lack of settings.`,
@@ -65,9 +65,13 @@ const sendEvent = async ({ client, server, guild, event, settings, track, limits
   }
 
   let channel = setting.channel;
-  if (type === EVENT_TYPES.KILLS || type === EVENT_TYPES.DEATHS || type === EVENT_TYPES.ASSISTS) {
-    channel = trackItem?.[type]?.channel || channel;
-  } else if (type === "juicy") {
+  if (
+    category === EVENT_CATEGORIES.KILLS ||
+    category === EVENT_CATEGORIES.DEATHS ||
+    category === EVENT_CATEGORIES.ASSISTS
+  ) {
+    channel = trackItem?.[category]?.channel || channel;
+  } else if (category === EVENT_CATEGORIES.JUICY) {
     channel = setting[juicy].channel;
   }
 
@@ -166,7 +170,8 @@ async function subscribe(client) {
             settings,
             track,
             limits,
-            type: guildEvent.eventType,
+            category: guildEvent.category,
+            premium: guildEvent.category === EVENT_CATEGORIES.DEPTHS,
           });
         }
         if (event.juicy && settings.juicy.enabled[event.server]) {
@@ -178,7 +183,7 @@ async function subscribe(client) {
             settings,
             track,
             limits,
-            type: "juicy",
+            category: EVENT_CATEGORIES.JUICY,
             premium: true,
           });
         }

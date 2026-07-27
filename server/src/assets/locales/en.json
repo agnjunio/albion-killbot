@@ -71,6 +71,7 @@
       "BATTLES": "Change settings for battle notifications.",
       "CHANNEL": "Channel to send notifications",
       "DEATHS": "Change settings for death notifications.",
+      "DEPTHS": "Change settings for Depths kill notifications. (Premium)",
       "GENERAL": "Change general settings",
       "GUILD_TAGS": "Show guild tags in player's names.",
       "JUICY": "Change settings for juicy kills.",

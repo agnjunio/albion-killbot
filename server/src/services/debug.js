@@ -32,6 +32,7 @@ async function publishEvents({ eventIds = [], server: serverId }) {
     }
 
     event.server = server.id;
+    await eventsService.preprocessEvent(event, { server });
     events.push(event);
   }
 

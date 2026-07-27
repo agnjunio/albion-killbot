@@ -1,6 +1,7 @@
 import {
   faChartBar,
   faCrown,
+  faDungeon,
   faGear,
   faGlobe,
   faImages,
@@ -66,6 +67,13 @@ const HOME_FEATURES: HomeFeature[] = [
     icon: faSackDollar,
     description:
       "Premium feed of the most expensive kills, with configurable thresholds.",
+  },
+  {
+    premium: true,
+    name: "Depths Kills",
+    icon: faDungeon,
+    description:
+      "Premium notifications for kills that happened in Depths.",
   },
   {
     name: "Battles",

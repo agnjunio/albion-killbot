@@ -1,6 +1,7 @@
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import {
   faCrown,
+  faDungeon,
   faGear,
   faList,
   faPeopleGroup,
@@ -68,6 +69,14 @@ export const SERVER_NAV_SECTIONS: ServerNavSection[] = [
         icon: faSackDollar,
         description:
           "Configure premium juicy kill notifications and thresholds.",
+        premium: true,
+      },
+      {
+        path: "depths",
+        name: "Depths Kills",
+        icon: faDungeon,
+        description:
+          "Configure premium notifications for kills that happened in Depths.",
         premium: true,
       },
       {

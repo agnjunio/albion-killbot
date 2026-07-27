@@ -14,10 +14,21 @@ const REPORT_MODES = {
   TEXT: "text",
 };
 
-const EVENT_TYPES = {
+// Albion-killbot facing category: which settings section/channel an event is routed to.
+const EVENT_CATEGORIES = {
   KILLS: "kills",
   DEATHS: "deaths",
   ASSISTS: "assists",
+  JUICY: "juicy",
+  DEPTHS: "depths",
+};
+
+// The underlying nature of the event from the tracked entity's perspective, independent
+// of which category it gets routed to (e.g. a Depths kill is still a "kill").
+const EVENT_TYPES = {
+  KILL: "kill",
+  DEATH: "death",
+  ASSIST: "assist",
 };
 
 const liveId = {
@@ -77,6 +88,7 @@ module.exports = {
   RANKING_MODES,
   REPORT_MODES,
   REPORT_PROVIDERS,
+  EVENT_CATEGORIES,
   EVENT_TYPES,
   SUBSCRIPTION_STATUS,
 };

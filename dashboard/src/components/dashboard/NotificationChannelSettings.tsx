@@ -14,6 +14,7 @@ interface NotificationChannelSettingsProps {
   serverId: string;
   notificationType: string;
   testMode?: string;
+  disabled?: boolean;
 }
 
 const NotificationChannelSettings = ({
@@ -27,6 +28,7 @@ const NotificationChannelSettings = ({
   serverId,
   notificationType,
   testMode,
+  disabled = false,
 }: NotificationChannelSettingsProps) => {
   const [dispatchTestNotification, testNotification] =
     useTestNotificationSettingsMutation();
@@ -38,6 +40,7 @@ const NotificationChannelSettings = ({
           type="switch"
           label="Enabled"
           checked={enabled}
+          disabled={disabled}
           onChange={(e) => onEnabledChange(e.target.checked)}
         />
       </Form.Group>
@@ -48,7 +51,7 @@ const NotificationChannelSettings = ({
             <Form.Label>Notification Channel</Form.Label>
             <ChannelInput
               aria-label={channelAriaLabel}
-              disabled={!enabled}
+              disabled={disabled || !enabled}
               availableChannels={channels}
               value={channel}
               onChannelChange={onChannelChange}
@@ -57,7 +60,7 @@ const NotificationChannelSettings = ({
         </Col>
         <Col xs={12} md="auto">
           <Button
-            disabled={!enabled || testNotification.isLoading}
+            disabled={disabled || !enabled || testNotification.isLoading}
             variant="secondary"
             type="button"
             onClick={() => {

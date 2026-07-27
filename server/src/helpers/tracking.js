@@ -1,5 +1,5 @@
 const { equalsCaseInsensitive } = require("./utils");
-const { EVENT_TYPES } = require("./constants");
+const { EVENT_CATEGORIES, EVENT_TYPES } = require("./constants");
 
 const applyLimitsToTrack = (track, limits) => {
   let players = track.players || [];
@@ -37,8 +37,12 @@ function findTrackItemForPlayer(player, { players, guilds, alliances }, eventSer
   return null;
 }
 
-// This method checks if an event is tracked by a discord server
-// and flags it as a kill, death, or assist event for the matched track item
+// This method checks if an event is tracked by a discord server for the matched track item.
+// It sets two independent flags on the result:
+// - type: the underlying nature of the event (kill/death/assist), always accurate regardless
+//   of where it gets routed. Used by embeds for title/color.
+// - category: which settings section/channel the event is routed to (kills/deaths/assists,
+//   or depths when the event happened in Depths).
 function getTrackedEvent(event, track, limits) {
   const { players, guilds, alliances } = applyLimitsToTrack(track, limits);
 
@@ -46,16 +50,26 @@ function getTrackedEvent(event, track, limits) {
     return null;
   }
 
+  const depthsCategory = event.Location === "Depths" ? EVENT_CATEGORIES.DEPTHS : null;
+
   // Check if the killer is tracked
   let trackItem = findTrackItemForPlayer(event.Killer, { players, guilds, alliances }, event.server);
   if (trackItem) {
-    return Object.assign({}, event, { good: true, eventType: EVENT_TYPES.KILLS, trackItem });
+    return Object.assign({}, event, {
+      type: EVENT_TYPES.KILL,
+      category: depthsCategory || EVENT_CATEGORIES.KILLS,
+      trackItem,
+    });
   }
 
   // Check if the victim is tracked
   trackItem = findTrackItemForPlayer(event.Victim, { players, guilds, alliances }, event.server);
   if (trackItem) {
-    return Object.assign({}, event, { good: false, eventType: EVENT_TYPES.DEATHS, trackItem });
+    return Object.assign({}, event, {
+      type: EVENT_TYPES.DEATH,
+      category: depthsCategory || EVENT_CATEGORIES.DEATHS,
+      trackItem,
+    });
   }
 
   // Check if any other participant is tracked
@@ -65,7 +79,12 @@ function getTrackedEvent(event, track, limits) {
 
       trackItem = findTrackItemForPlayer(participant, { players, guilds, alliances }, event.server);
       if (trackItem) {
-        return Object.assign({}, event, { eventType: EVENT_TYPES.ASSISTS, trackItem, assistPlayer: participant });
+        return Object.assign({}, event, {
+          type: EVENT_TYPES.ASSIST,
+          category: depthsCategory || EVENT_CATEGORIES.ASSISTS,
+          trackItem,
+          assistPlayer: participant,
+        });
       }
     }
   }
