@@ -178,7 +178,7 @@ jobs:
 
   deploy-bot:
     name: Deploy bot shards
-    if: ${{ inputs.bot && contains(inputs.bot_shards, matrix.shard) }}
+    if: ${{ inputs.bot }}
     runs-on: ubuntu-latest
     environment: production
     strategy:
@@ -199,6 +199,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Rsync deployment files
+        if: ${{ contains(inputs.bot_shards, matrix.shard) }}
         uses: burnett01/rsync-deployments@7.1.0
         with:
           switches: -avzr --delete
@@ -209,6 +210,7 @@ jobs:
           remote_key: ${{ secrets.SSH_KEY }}
 
       - name: Generate environment file
+        if: ${{ contains(inputs.bot_shards, matrix.shard) }}
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ vars[matrix.SSH_HOST] }}
@@ -226,6 +228,7 @@ jobs:
             EOF
 
       - name: Deploy application
+        if: ${{ contains(inputs.bot_shards, matrix.shard) }}
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ vars[matrix.SSH_HOST] }}
