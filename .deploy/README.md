@@ -17,3 +17,19 @@ would follow the same shape.
 - The dashboard (static site) deploys separately via
   `.github/workflows/dashboard-release.yml` — different shape (rsync a build
   output, no compose), left as-is.
+
+## RabbitMQ: manual step after any volume wipe
+
+`RABBITMQ_DEFAULT_USER`/`RABBITMQ_DEFAULT_PASS` (set from the `RABBITMQ_USER`/
+`RABBITMQ_PASSWORD` secrets) only bootstrap RabbitMQ's *admin* user on first
+boot. The actual app user — the one embedded in `AMQP_URL`, used by `crawler`
+and every `bot` shard — is a **separate user that must be created manually**
+via `rabbitmqctl` any time the `rabbitmq_data` volume is fresh (new host,
+volume wiped, `docker compose down -v`). It is not created by any env var or
+compose config.
+
+If crawler/bots start logging `ACCESS_REFUSED` after a redeploy, this is why.
+Fix: exec into the `rabbitmq` container and run
+`rabbitmqctl add_user <user> <password>` +
+`rabbitmqctl set_permissions -p albion-killbot <user> ".*" ".*" ".*"`,
+using the exact username/password embedded in the `AMQP_URL` secret.
