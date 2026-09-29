@@ -1,0 +1,26 @@
+# Datadog Agent log-collection config, manually installed on each host
+# (api/bot/crawler) — not deployed by any automation. Kept here as reference.
+#
+# NOTE: the paths below (/home/albion-killbot/logs/...) don't match the
+# current compose mounts (/var/log/<service> on the host, per
+# .deploy/production/*/docker-compose.yml). Inherited as-is from the old
+# iac-infra copy — verify against the actual Datadog Agent config on each
+# host before relying on this.
+logs:
+  - type: file
+    path: "/home/albion-killbot/logs/api/debug.log"
+    service: api
+    source: nodejs
+    sourcecategory: sourcecode
+
+  - type: file
+    path: "/home/albion-killbot/logs/bot/debug.log"
+    service: bot
+    source: nodejs
+    sourcecategory: sourcecode
+
+  - type: file
+    path: "/home/albion-killbot/logs/crawler/debug.log"
+    service: crawler
+    source: nodejs
+    sourcecategory: sourcecode

@@ -17,6 +17,11 @@ would follow the same shape.
 - The dashboard (static site) deploys separately via
   `.github/workflows/dashboard-release.yml` — different shape (rsync a build
   output, no compose), left as-is.
+- `production/api/nginx.conf` and `production/datadog-agent.yaml` are
+  **not deployed by any automation** — nginx and the Datadog Agent aren't
+  containerized here, both are installed directly on the hosts. These files
+  are reference copies only (rescued from the old `iac-infra` repo); if you
+  change either on a host, mirror the change back here.
 
 ## RabbitMQ: manual step after any volume wipe
 
