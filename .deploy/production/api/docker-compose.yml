@@ -1,0 +1,42 @@
+services:
+  api:
+    image: agnjunio/albion-killbot:latest
+    restart: always
+    command: npm run start:api
+    environment:
+      - NODE_ENV=production
+      - AMQP_QUEUE_BATTLES_BATCH=true
+      - AMQP_QUEUE_EVENTS_BATCH=true
+      - DASHBOARD_URL=https://albion-killbot.com
+      - DEBUG_LEVEL=info
+      - MAX_ALLIANCES=0
+      - MAX_GUILDS=0
+      - MAX_PLAYERS=5
+      - SUBSCRIPTIONS_MODE=true
+      - SUB_MAX_ALLIANCES=0
+      - SUB_MAX_GUILDS=1
+      - SUB_MAX_PLAYERS=10
+
+      # Environment variables passed from host (no hardcoded secrets)
+      - AMQP_URL=${AMQP_URL}
+      - DISCORD_CLIENT_ID=${DISCORD_CLIENT_ID}
+      - DISCORD_CLIENT_SECRET=${DISCORD_CLIENT_SECRET}
+      - DISCORD_COMMUNITY_ADMINS=${DISCORD_COMMUNITY_ADMINS}
+      - DISCORD_COMMUNITY_PREMIUM_ROLE=${DISCORD_COMMUNITY_PREMIUM_ROLE}
+      - DISCORD_COMMUNITY_SERVER=${DISCORD_COMMUNITY_SERVER}
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+      - MONGODB_URL=${MONGODB_URL}
+      - SESSION_SECRET=${SESSION_SECRET}
+      - STRIPE_ACCESS_TOKEN=${STRIPE_ACCESS_TOKEN}
+      - STRIPE_PRODUCT=${STRIPE_PRODUCT}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+    ports:
+      - 127.0.0.1:3000:80
+    volumes:
+      - cache:/tmp/albion-killbot-cache
+      - /var/log/api:/app/logs
+    labels:
+      com.datadoghq.ad.logs: '[{"source":"nodejs","sourcecategory":"sourcecode","service":"api","type":"file","path":"/var/log/api/debug.log"}]'
+
+volumes:
+  cache:

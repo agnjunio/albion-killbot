@@ -1,0 +1,40 @@
+services:
+  bot:
+    container_name: albion-killbot-bot-${SHARD}
+    image: agnjunio/albion-killbot:latest
+    command: npm run start:bot
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - DASHBOARD_URL=https://albion-killbot.com
+      - AMQP_QUEUE_BATTLES_BATCH=true
+      - AMQP_QUEUE_EVENTS_BATCH=true
+      - DEBUG_LEVEL=debug
+      - GUILD_RANKINGS=true
+      - FEATURE_USE_HISTORY_PRICES=true
+      - MAX_ALLIANCES=0
+      - MAX_GUILDS=0
+      - MAX_PLAYERS=5
+      - SHARDS_TOTAL=4
+      - SUBSCRIPTIONS_MODE=true
+      - SUB_MAX_ALLIANCES=0
+      - SUB_MAX_GUILDS=1
+      - SUB_MAX_PLAYERS=10
+
+      # Environment variables passed from host (no hardcoded secrets)
+      - SHARDS_TO_SPAWN=${SHARD}
+      - AMQP_URL=${AMQP_URL}
+      - DISCORD_COMMUNITY_PREMIUM_ROLE=${DISCORD_COMMUNITY_PREMIUM_ROLE}
+      - DISCORD_COMMUNITY_SERVER=${DISCORD_COMMUNITY_SERVER}
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+      - MONGODB_URL=${MONGODB_URL}
+    volumes:
+      - cache:/tmp/albion-killbot-cache
+      - /var/log/bot:/app/logs
+    logging:
+      driver: "none"
+    labels:
+      com.datadoghq.ad.logs: '[{"source":"nodejs","sourcecategory":"sourcecode","service":"bot","type":"file","path":"/var/log/bot/debug.log"}]'
+
+volumes:
+  cache:

@@ -1,0 +1,46 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    hostname: albion-killbot
+    restart: always
+    environment:
+      - RABBITMQ_DEFAULT_VHOST=albion-killbot
+
+      # Environment variables passed from host (no hardcoded secrets)
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
+    ports:
+      - 5671:5671
+      - 443:15671
+    healthcheck:
+      test: rabbitmqctl status
+      interval: 5s
+      timeout: 30s
+      retries: 5
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+      - ./rabbitmq/conf.d:/etc/rabbitmq/conf.d
+      - /etc/letsencrypt/live/amqp.albion-killbot.com/fullchain.pem:/etc/letsencrypt/live/amqp.albion-killbot.com/fullchain.pem
+      - /etc/letsencrypt/live/amqp.albion-killbot.com/privkey.pem:/etc/letsencrypt/live/amqp.albion-killbot.com/privkey.pem
+
+  crawler:
+    image: agnjunio/albion-killbot:latest
+    command: npm run start:crawler
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - AMQP_QUEUE_BATTLES_BATCH=true
+      - AMQP_QUEUE_EVENTS_BATCH=true
+      - DEBUG_LEVEL=info
+
+      # Environment variables passed from host (no hardcoded secrets)
+      - AMQP_URL=${AMQP_URL}
+      - MONGODB_URL=${MONGODB_URL}
+    volumes:
+      - ./migration-state.json:/app/migrations/migration-state.json
+      - /var/log/crawler:/app/logs
+    labels:
+      com.datadoghq.ad.logs: '[{"source":"nodejs","sourcecategory":"sourcecode","service":"crawler","type":"file","path":"/var/log/crawler/debug.log"}]'
+
+volumes:
+  rabbitmq_data:

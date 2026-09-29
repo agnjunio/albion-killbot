@@ -40,7 +40,7 @@ jobs:
   deploy:
     name: Deploy
     needs: publish
-    uses: ./.github/workflows/deploy.yml
+    uses: ./.github/workflows/deploy-production.yml
     with:
       api: true
       crawler: true

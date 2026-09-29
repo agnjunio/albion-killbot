@@ -1,0 +1,253 @@
+name: Deploy Production
+
+# Self-contained: rsyncs .deploy/production/<service>/ to its host, writes .env from
+# this repo's "production" GitHub Environment, then docker compose pull/up. See
+# .deploy/README.md.
+on:
+  workflow_call:
+    inputs:
+      api:
+        required: true
+        type: boolean
+      crawler:
+        required: true
+        type: boolean
+      bot:
+        required: true
+        type: boolean
+      bot_shards:
+        required: false
+        type: string
+        default: "0,1,2,3"
+  workflow_dispatch:
+    inputs:
+      api:
+        type: boolean
+        default: true
+      crawler:
+        type: boolean
+        default: true
+      bot:
+        type: boolean
+        default: true
+      bot_shards:
+        type: string
+        default: "0,1,2,3"
+        description: "Comma-separated shard numbers to deploy (e.g. '0' for just shard 0)"
+
+jobs:
+  deploy-api:
+    name: Deploy api
+    if: ${{ inputs.api }}
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Rsync deployment files
+        uses: burnett01/rsync-deployments@7.1.0
+        with:
+          switches: -avzr --delete
+          path: .deploy/production/api/
+          remote_path: ~/albion-killbot-api/
+          remote_host: ${{ vars.SSH_HOST_API }}
+          remote_user: ${{ vars.SSH_USER }}
+          remote_key: ${{ secrets.SSH_KEY }}
+
+      - name: Generate environment file
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ vars.SSH_HOST_API }}
+          username: ${{ vars.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd ~/albion-killbot-api
+            cat > .env << 'EOF'
+            AMQP_URL=${{ secrets.AMQP_URL }}
+            DISCORD_CLIENT_ID=${{ vars.DISCORD_CLIENT_ID }}
+            DISCORD_CLIENT_SECRET=${{ secrets.DISCORD_CLIENT_SECRET }}
+            DISCORD_COMMUNITY_ADMINS=${{ vars.DISCORD_COMMUNITY_ADMINS }}
+            DISCORD_COMMUNITY_PREMIUM_ROLE=${{ vars.DISCORD_COMMUNITY_PREMIUM_ROLE }}
+            DISCORD_COMMUNITY_SERVER=${{ vars.DISCORD_COMMUNITY_SERVER }}
+            DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }}
+            MONGODB_URL=${{ secrets.MONGODB_URL }}
+            SESSION_SECRET=${{ secrets.SESSION_SECRET }}
+            STRIPE_ACCESS_TOKEN=${{ secrets.STRIPE_ACCESS_TOKEN }}
+            STRIPE_PRODUCT=${{ vars.STRIPE_PRODUCT }}
+            STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}
+            EOF
+
+      - name: Deploy application
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ vars.SSH_HOST_API }}
+          username: ${{ vars.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd ~/albion-killbot-api
+
+            echo "➡️ Pulling latest application images..."
+            if ! docker compose --ansi never pull; then
+              echo "❌ Docker image pull failed!"
+              exit 1
+            fi
+            echo "✅ Docker images pulled successfully"
+
+            echo "➡️ Starting application containers..."
+            if ! docker compose --env-file .env --ansi never up -d --force-recreate --remove-orphans; then
+              echo "❌ Application deployment failed!"
+              exit 1
+            fi
+            echo "✅ Application deployed successfully"
+
+            echo "➡️ Pruning unused images..."
+            docker image prune -a -f
+            echo "✅ Unused images pruned"
+
+  deploy-crawler:
+    name: Deploy crawler
+    if: ${{ inputs.crawler }}
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Rsync deployment files
+        uses: burnett01/rsync-deployments@7.1.0
+        with:
+          switches: -avzr --delete
+          path: .deploy/production/crawler/
+          remote_path: ~/albion-killbot-crawler/
+          remote_host: ${{ vars.SSH_HOST_CRAWLER }}
+          remote_user: ${{ vars.SSH_USER }}
+          remote_key: ${{ secrets.SSH_KEY }}
+
+      - name: Generate environment file
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ vars.SSH_HOST_CRAWLER }}
+          username: ${{ vars.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd ~/albion-killbot-crawler
+            cat > .env << 'EOF'
+            AMQP_URL=${{ secrets.AMQP_URL }}
+            MONGODB_URL=${{ secrets.MONGODB_URL }}
+            RABBITMQ_USER=${{ secrets.RABBITMQ_USER }}
+            RABBITMQ_PASSWORD=${{ secrets.RABBITMQ_PASSWORD }}
+            EOF
+
+      - name: Deploy application
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ vars.SSH_HOST_CRAWLER }}
+          username: ${{ vars.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd ~/albion-killbot-crawler
+
+            echo "➡️ Pulling latest application images..."
+            if ! docker compose --ansi never pull; then
+              echo "❌ Docker image pull failed!"
+              exit 1
+            fi
+            echo "✅ Docker images pulled successfully"
+
+            touch migration-state.json
+            echo "➡️ Running database migrations..."
+            if ! docker compose --env-file .env --ansi never run --rm crawler npm run db:migrate; then
+              echo "❌ Database migration failed!"
+              exit 1
+            fi
+            echo "✅ Database migration completed successfully"
+
+            echo "➡️ Starting application containers..."
+            if ! docker compose --env-file .env --ansi never up -d --force-recreate --remove-orphans; then
+              echo "❌ Application deployment failed!"
+              exit 1
+            fi
+            echo "✅ Application deployed successfully"
+
+            echo "➡️ Pruning unused images..."
+            docker image prune -a -f
+            echo "✅ Unused images pruned"
+
+  deploy-bot:
+    name: Deploy bot shards
+    if: ${{ inputs.bot && contains(inputs.bot_shards, matrix.shard) }}
+    runs-on: ubuntu-latest
+    environment: production
+    strategy:
+      matrix:
+        shard: [0, 1, 2, 3]
+        include:
+          - shard: 0
+            SSH_HOST: SSH_HOST_BOT_0
+          - shard: 1
+            SSH_HOST: SSH_HOST_BOT_1
+          - shard: 2
+            SSH_HOST: SSH_HOST_BOT_2
+          - shard: 3
+            SSH_HOST: SSH_HOST_BOT_3
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Rsync deployment files
+        uses: burnett01/rsync-deployments@7.1.0
+        with:
+          switches: -avzr --delete
+          path: .deploy/production/bot/
+          remote_path: ~/albion-killbot-bot/
+          remote_host: ${{ vars[matrix.SSH_HOST] }}
+          remote_user: ${{ vars.SSH_USER }}
+          remote_key: ${{ secrets.SSH_KEY }}
+
+      - name: Generate environment file
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ vars[matrix.SSH_HOST] }}
+          username: ${{ vars.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd ~/albion-killbot-bot
+            cat > .env << 'EOF'
+            SHARD=${{ matrix.shard }}
+            AMQP_URL=${{ secrets.AMQP_URL }}
+            DISCORD_COMMUNITY_PREMIUM_ROLE=${{ vars.DISCORD_COMMUNITY_PREMIUM_ROLE }}
+            DISCORD_COMMUNITY_SERVER=${{ vars.DISCORD_COMMUNITY_SERVER }}
+            DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }}
+            MONGODB_URL=${{ secrets.MONGODB_URL }}
+            EOF
+
+      - name: Deploy application
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ vars[matrix.SSH_HOST] }}
+          username: ${{ vars.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd ~/albion-killbot-bot
+
+            echo "➡️ Pulling latest application images..."
+            if ! docker compose --ansi never pull; then
+              echo "❌ Docker image pull failed!"
+              exit 1
+            fi
+            echo "✅ Docker images pulled successfully"
+
+            echo "➡️ Starting application containers..."
+            if ! docker compose --env-file .env --ansi never up -d --force-recreate --remove-orphans; then
+              echo "❌ Application deployment failed!"
+              exit 1
+            fi
+            echo "✅ Application deployed successfully"
+
+            echo "➡️ Pruning unused images..."
+            docker image prune -a -f
+            echo "✅ Unused images pruned"
